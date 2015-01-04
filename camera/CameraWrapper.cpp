@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012, The CyanogenMod Project
+ * Copyright (C) 2014, The OmniRom Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +34,7 @@
 #include <hardware/camera.h>
 #include <camera/Camera.h>
 #include <camera/CameraParameters.h>
+#include "CameraParametersExtra.h"
 
 static android::Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
@@ -115,12 +117,12 @@ const static char * iso_values[] = {"auto,"
 
 static char * camera_fixup_getparams(int id, const char * settings)
 {
-    android::CameraParameters params;
+    android::CameraParametersExtra params;
     params.unflatten(android::String8(settings));
 
     // fix params here
 #ifdef QCOM_HARDWARE
-    params.set(android::CameraParameters::KEY_SUPPORTED_ISO_MODES, iso_values[id]);
+    params.set(android::CameraParametersExtra::KEY_SUPPORTED_ISO_MODES, iso_values[id]);
 #endif
 #ifdef PREVIEW_SIZE_FIXUP
     params.set(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO, id ? "640x480" : "800x480");
@@ -134,10 +136,10 @@ static char * camera_fixup_getparams(int id, const char * settings)
     /* Disable face detection for front facing camera */
     if(id == 1) {
 #endif
-        params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_HW, "0");
-        params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
-        params.set(android::CameraParameters::KEY_FACE_DETECTION, "off");
-        params.set(android::CameraParameters::KEY_SUPPORTED_FACE_DETECTION, "off");
+        params.set(android::CameraParametersExtra::KEY_MAX_NUM_DETECTED_FACES_HW, "0");
+        params.set(android::CameraParametersExtra::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
+        params.set(android::CameraParametersExtra::KEY_FACE_DETECTION, "off");
+        params.set(android::CameraParametersExtra::KEY_SUPPORTED_FACE_DETECTION, "off");
 #ifndef DISABLE_FACE_DETECTION_BOTH_CAMERAS
     }
 #endif
@@ -155,31 +157,31 @@ static bool wasVideo = false;
 char * camera_fixup_setparams(struct camera_device * device, const char * settings)
 {
     int id = CAMERA_ID(device);
-    android::CameraParameters params;
+    android::CameraParametersExtra params;
     params.unflatten(android::String8(settings));
     const char KEY_SAMSUNG_CAMERA_MODE[] = "cam_mode";
     const char* camMode = params.get(KEY_SAMSUNG_CAMERA_MODE);
 
     bool isVideo = !strcmp(params.get(android::CameraParameters::KEY_RECORDING_HINT), "true");
-    bool enableZSL = !strcmp(params.get(android::CameraParameters::KEY_ZSL), "on");
+    bool enableZSL = !strcmp(params.get(android::CameraParametersExtra::KEY_ZSL), "on");
 
     // fix params here
     // No need to fix-up ISO_HJR, it is the same for userspace and the camera lib
 #ifdef QCOM_HARDWARE
     if(params.get("iso")) {
-        const char* isoMode = params.get(android::CameraParameters::KEY_ISO_MODE);
-        if(strcmp(isoMode, "ISO100") == 0)
-            params.set(android::CameraParameters::KEY_ISO_MODE, "100");
+        const char* isoMode = params.get(android::CameraParametersExtra::KEY_ISO_MODE);
+        if(strcmp(isoMode, "ISO50") == 0)
+            params.set(android::CameraParametersExtra::KEY_ISO_MODE, "50");
+        else if(strcmp(isoMode, "ISO100") == 0)
+            params.set(android::CameraParametersExtra::KEY_ISO_MODE, "100");
         else if(strcmp(isoMode, "ISO200") == 0)
-            params.set(android::CameraParameters::KEY_ISO_MODE, "200");
+            params.set(android::CameraParametersExtra::KEY_ISO_MODE, "200");
         else if(strcmp(isoMode, "ISO400") == 0)
-            params.set(android::CameraParameters::KEY_ISO_MODE, "400");
+            params.set(android::CameraParametersExtra::KEY_ISO_MODE, "400");
         else if(strcmp(isoMode, "ISO800") == 0)
-            params.set(android::CameraParameters::KEY_ISO_MODE, "800");
+            params.set(android::CameraParametersExtra::KEY_ISO_MODE, "800");
         else if(strcmp(isoMode, "ISO1600") == 0)
-            params.set(android::CameraParameters::KEY_ISO_MODE, "1600");
-        else if(strcmp(isoMode, "ISO50") == 0)
-            params.set(android::CameraParameters::KEY_ISO_MODE, "50");
+            params.set(android::CameraParametersExtra::KEY_ISO_MODE, "1600");
     }
 #endif
 
@@ -190,8 +192,8 @@ char * camera_fixup_setparams(struct camera_device * device, const char * settin
 #endif
         params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_HW, "0");
         params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
-        params.set(android::CameraParameters::KEY_FACE_DETECTION, "off");
-        params.set(android::CameraParameters::KEY_SUPPORTED_FACE_DETECTION, "off");
+        params.set(android::CameraParametersExtra::KEY_FACE_DETECTION, "off");
+        params.set(android::CameraParametersExtra::KEY_SUPPORTED_FACE_DETECTION, "off");
 #ifndef DISABLE_FACE_DETECTION_BOTH_CAMERAS
     }
 #endif
@@ -223,8 +225,8 @@ char * camera_fixup_setparams(struct camera_device * device, const char * settin
 #ifdef DISABLE_ZSL_FOR_FFC
     if (id != 1) {
 #endif
-        params.set(android::CameraParameters::KEY_ZSL, isVideo ? "off" : "on");
-        params.set(android::CameraParameters::KEY_CAMERA_MODE, isVideo ? "0" : "1");
+        params.set(android::CameraParametersExtra::KEY_ZSL, isVideo ? "off" : "on");
+        params.set(android::CameraParametersExtra::KEY_CAMERA_MODE, isVideo ? "0" : "1");
 #ifdef MAGIC_ZSL_1508
         if (!isVideo) {
             camera_send_command(device, 1508, 0, 0);

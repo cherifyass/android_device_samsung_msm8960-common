@@ -28,4 +28,20 @@
          config_hardware_automatic_brightness_available is not set, so we will use software implementation -->
     <bool name="config_automatic_brightness_available">true</bool>
 
+   <!-- Power menu actions -->
+   <string-array translatable="false" name="config_globalActionsList">
+        <item>power</item>
+        <item>reboot</item>
+        <item>airplane</item>
+        <item>users</item>
+        <item>silent</item>
+        <item>bugreport</item>
+    </string-array>
+
+    <!-- reboot action menu 
+  <string-array translatable="false" name="config_rebootActionsList">
+    <item>reboot</item>
+    <item>reboot_recovery</item>
+  </string-array>   -->
+
 </resources>

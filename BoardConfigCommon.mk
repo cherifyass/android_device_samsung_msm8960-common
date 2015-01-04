@@ -73,6 +73,11 @@ BOARD_USES_FLUENCE_FOR_VOIP := true
 BOARD_USES_SEPERATED_AUDIO_INPUT := true
 TARGET_USES_QCOM_COMPRESSED_AUDIO := true
 
+# Ignore new google audio policy in av, use old HAL policy instead for now
+USE_LEGACY_AUDIO_POLICY := 1
+USE_CUSTOM_AUDIO_POLICY := 0
+BOARD_USES_EXTN_AUDIO_POLICY_MANAGER := true
+
 # QCOM enhanced A/V
 TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
 
@@ -90,31 +95,8 @@ TARGET_QCOM_MEDIA_VARIANT := caf
 
 
 # SELinux
-BOARD_SEPOLICY_DIRS += \
-        device/samsung/msm8960-common/sepolicy
 
-BOARD_SEPOLICY_UNION += \
-        file_contexts \
-        app.te \
-        bluetooth.te \
-        device.te \
-        domain.te \
-        drmserver.te \
-        file.te \
-        hci_init.te \
-        healthd.te \
-        init.te \
-        init_shell.te \
-        keystore.te \
-        kickstart.te \
-        mediaserver.te \
-        nfc.te \
-        rild.te \
-        surfaceflinger.te \
-        system.te \
-        ueventd.te \
-        wpa.te \
-        wpa_socket.te
+
 
 # Offmode charging
 #

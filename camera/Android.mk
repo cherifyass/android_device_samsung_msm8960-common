@@ -51,6 +51,7 @@ ifeq ($(TARGET_DISABLE_ZSL_FOR_FFC),true)
     LOCAL_CFLAGS += -DDISABLE_ZSL_FOR_FFC
 endif
 LOCAL_SRC_FILES := \
+    CameraParametersExtra.cpp \
     CameraWrapper.cpp
 
 LOCAL_C_INCLUDES := \
